@@ -92,7 +92,7 @@ String GoogleTTS::createToken(const char* text, const char* key) {
 }
 
 String GoogleTTS::getTKK() {
-  if (m_tkk.length() != 0) {// && millis() > m_lastTimestamp && millis() - < m_lastTimestamp ) {
+  if (m_tkk.length() != 0 && millis() > m_lastTimestamp && millis() - 3600000 < m_lastTimestamp ) {
     return m_tkk;
   }
 
