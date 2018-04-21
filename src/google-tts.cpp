@@ -94,8 +94,6 @@ String GoogleTTS::createToken(const char* text, const char* key) {
 }
 
 String GoogleTTS::getTKK() {
-  Serial.print("TTS is :");
-  Serial.println(m_tkk);
   unsigned long current = millis();
   if (m_tkk.length() != 0
   //  && millis() > m_lastTimestamp
@@ -157,7 +155,7 @@ String GoogleTTS::getTKK() {
       tkkFunc += String(ch);
     } while(tkkFunc.length() < 3);
 
-    tkkFunc +=  client.readStringUntil('V');
+    tkkFunc +=  client.readStringUntil('}');
     client.stop();
 
     int head = tkkFunc.indexOf("3d") + 2;
