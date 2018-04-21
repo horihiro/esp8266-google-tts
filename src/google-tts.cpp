@@ -1,5 +1,7 @@
 #include "google-tts.h"
 
+#define HTTP_TCP_BUFFER_SIZE (1460)
+
 String GoogleTTS::urlencode(String str)
 {
     String encodedString="";
@@ -92,11 +94,15 @@ String GoogleTTS::createToken(const char* text, const char* key) {
 }
 
 String GoogleTTS::getTKK() {
-  Serial.println(m_tkk.length() != 0);
-  Serial.println(millis() > m_lastTimestamp);
-  Serial.println(millis() - 3600000);
-  Serial.println(m_lastTimestamp);
-  if (m_tkk.length() != 0 && millis() > m_lastTimestamp && millis() < m_lastTimestamp + 3600000 ) {
+  Serial.print("TTS is :");
+  Serial.println(m_tkk);
+  unsigned long current = millis();
+  if (m_tkk.length() != 0
+  //  && millis() > m_lastTimestamp
+  //  && (
+  //    (m_lastTimestamp < m_lastTimestamp + TTK_EXPIRE && current < m_lastTimestamp + TTK_EXPIRE)
+  //     || (current - TTK_EXPIRE < current && current - TTK_EXPIRE < m_lastTimestamp)
+  ) {
     return m_tkk;
   }
 
@@ -112,42 +118,62 @@ String GoogleTTS::getTKK() {
   //   Serial.println("certificate doesn't match");
   // }
   client.print(
-    String("GET / HTTP/1.1\r\n") +
+    String("GET / HTTP/1.0\r\n") +
     "Host: " + HOST_GTRANS + "\r\n" +
     "User-Agent: " + LIB_NAME + "/" + LIB_VERSION + "\r\n" +
-    "Accept: */*\r\n\r\n");
+    "Accept-Encoding: identity\r\n" +
+    "Accept: text/html\r\n\r\n");
   int timeout = millis() + 5000;
-  
+  client.flush();
+
   while (client.available() == 0) {
     if (timeout < millis()) {
-      Serial.println(">>> Client Timeout !");
       client.stop();
       return "_TIMEOUT";
     }
   }
   String line = "";
+  boolean isHeader = true;
   do {
-    delay(10);
     line = client.readStringUntil('\r');
-    int tkkpos = line.indexOf("TKK=eval");
-    if (tkkpos >= 0) {
-      int termpos = line.indexOf(");", tkkpos) + 2;
-      line = line.substring(tkkpos, termpos);
-      int head = line.indexOf("3d") + 2;
-      int tail = line.indexOf(";", head);
-      char* buf;
-      unsigned long a = strtoul(line.substring(head, tail).c_str(), &buf, 10);
-      head = line.indexOf("3d", tail) + 2;
-      tail = line.indexOf(";", head);
-      unsigned long b = strtoul(line.substring(head, tail).c_str(), &buf, 10);
-      head = line.indexOf("return ", tail) + 7;
-      tail = line.indexOf("+", head);
-      String c = line.substring(head, tail);
-      client.stop();
-      m_tkk = (c + "." + String(a + b));
-      m_lastTimestamp = millis();
-      return m_tkk;
+    line.trim();
+    if (line.length() == 0) {
+      isHeader = false;
     }
+    if (isHeader) continue;
+
+    String tkkFunc = "";
+    char ch;
+    do {
+      tkkFunc = "";
+      client.readBytes(&ch, 1);
+      if (ch != 'T') continue;
+      tkkFunc += String(ch);
+      client.readBytes(&ch, 1);
+      if (ch != 'K') continue;
+      tkkFunc += String(ch);
+      client.readBytes(&ch, 1);
+      if (ch != 'K') continue;
+      tkkFunc += String(ch);
+    } while(tkkFunc.length() < 3);
+
+    tkkFunc +=  client.readStringUntil('V');
+    client.stop();
+
+    int head = tkkFunc.indexOf("3d") + 2;
+    int tail = tkkFunc.indexOf(";", head);
+    char* buf;
+    unsigned long a = strtoul(tkkFunc.substring(head, tail).c_str(), &buf, 10);
+    head = tkkFunc.indexOf("3d", tail) + 2;
+    tail = tkkFunc.indexOf(";", head);
+    unsigned long b = strtoul(tkkFunc.substring(head, tail).c_str(), &buf, 10);
+    head = tkkFunc.indexOf("return ", tail) + 7;
+    tail = tkkFunc.indexOf("+", head);
+    String c = tkkFunc.substring(head, tail);
+    m_tkk = (c + "." + String(a + b));
+    m_lastTimestamp = millis();
+    return m_tkk;
+    delay(0);
   } while(line.length() > 0);
   client.stop();
   return "_ERROR";
