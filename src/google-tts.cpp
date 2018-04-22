@@ -95,12 +95,7 @@ String GoogleTTS::createToken(const char* text, const char* key) {
 
 String GoogleTTS::getTKK() {
   unsigned long current = millis();
-  if (m_tkk.length() != 0
-  //  && millis() > m_lastTimestamp
-  //  && (
-  //    (m_lastTimestamp < m_lastTimestamp + TTK_EXPIRE && current < m_lastTimestamp + TTK_EXPIRE)
-  //     || (current - TTK_EXPIRE < current && current - TTK_EXPIRE < m_lastTimestamp)
-  ) {
+  if (m_tkk.length() != 0 ) {
     return m_tkk;
   }
 
