@@ -1,3 +1,4 @@
+esp8266-google-tts	KEYWORD1
 TTS	KEYWORD1
 GoogleTTS	KEYWORD1
 getSpeechUrl	KEYWORD2
