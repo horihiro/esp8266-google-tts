@@ -95,9 +95,6 @@ String GoogleTTS::createToken(const char* text, const char* key) {
 
 String GoogleTTS::getTKK() {
   unsigned long current = millis();
-  if (m_tkk.length() != 0 ) {
-    return m_tkk;
-  }
 
   WiFiClientSecure client;
   if (!client.connect(HOST_GTRANS, 443)) {
@@ -105,11 +102,6 @@ String GoogleTTS::getTKK() {
     return "_ERROR";
   }
 
-  // if (client.verify(FINGERPRINT_GTRANS, HOST_GTRANS)) {
-  //   Serial.println("certificate matches");
-  // } else {
-  //   Serial.println("certificate doesn't match");
-  // }
   client.print(
     String("GET / HTTP/1.0\r\n") +
     "Host: " + HOST_GTRANS + "\r\n" +
