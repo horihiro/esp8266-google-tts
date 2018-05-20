@@ -3,6 +3,8 @@ Simple Google TTS Library for esp8266.
 
 This library generates the link to speech mp3 file from text using Google Translate Service.
 
+[This](https://qiita.com/horihiro/items/d64b699d06605ad44646) is the Japanese document on [Qiita.com](https://qiita.com/);
+
 ## Install
 This library can be installed from the Library Manager on Arduino IDE
 
