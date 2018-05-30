@@ -64,7 +64,7 @@ long long int GoogleTTS::XL (long long int a, char* b) {
     int  d = (long long int)b[c + 2];
     d = d >= 97 ? d - 87 : d - 48;
     d = (b[c + 1] == '+' ? a >> d : a << d);
-    a = b[c] == '+' ? a + d & 4294967295 : a ^ d;
+    a = b[c] == '+' ? (a + d) & 4294967295 : a ^ d;
   }
   return a;
 }
