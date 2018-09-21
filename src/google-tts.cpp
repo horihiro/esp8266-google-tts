@@ -121,7 +121,7 @@ String GoogleTTS::getTKK() {
   boolean isHeader = true;
   do {
     line = client.readStringUntil('\r');
-    line.trim();
+     line.trim();
     if (line.length() == 0) {
       isHeader = false;
     }
@@ -142,23 +142,11 @@ String GoogleTTS::getTKK() {
       tkkFunc += String(ch);
     } while(tkkFunc.length() < 3);
 
-    tkkFunc +=  client.readStringUntil('}');
-    client.stop();
+    tkkFunc +=  client.readStringUntil(';'); // "TKK='xxxxxxxxx.yyyyyyyyy'"
 
-    int head = tkkFunc.indexOf("3d") + 2;
-    int tail = tkkFunc.indexOf(";", head);
-    char* buf;
-    unsigned long a = strtoul(tkkFunc.substring(head, tail).c_str(), &buf, 10);
-    head = tkkFunc.indexOf("3d", tail) + 2;
-    tail = tkkFunc.indexOf(";", head);
-    unsigned long b = strtoul(tkkFunc.substring(head, tail).c_str(), &buf, 10);
-    head = tkkFunc.indexOf("return ", tail) + 7;
-    tail = tkkFunc.indexOf("+", head);
-    String c = tkkFunc.substring(head, tail);
-    m_tkk = (c + "." + String(a + b));
-    m_lastTimestamp = millis();
+    client.stop();
+    m_tkk = tkkFunc.substring(5 /* length of "TKK='" */, tkkFunc.lastIndexOf('\''));
     return m_tkk;
-    delay(0);
   } while(line.length() > 0);
   client.stop();
   return "_ERROR";
