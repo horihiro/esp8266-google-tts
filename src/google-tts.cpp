@@ -132,20 +132,21 @@ String GoogleTTS::getTKK() {
     do {
       tkkFunc = "";
       client.readBytes(&ch, 1);
-      if (ch != 'T') continue;
+      if (ch != 't') continue;
       tkkFunc += String(ch);
       client.readBytes(&ch, 1);
-      if (ch != 'K') continue;
+      if (ch != 'k') continue;
       tkkFunc += String(ch);
       client.readBytes(&ch, 1);
-      if (ch != 'K') continue;
+      if (ch != 'k') continue;
       tkkFunc += String(ch);
     } while(tkkFunc.length() < 3);
 
-    tkkFunc +=  client.readStringUntil(';'); // "TKK='xxxxxxxxx.yyyyyyyyy'"
+    tkkFunc +=  client.readStringUntil(','); // "tkk:'xxxxxxxxx.yyyyyyyyy'"
 
     client.stop();
-    m_tkk = tkkFunc.substring(5 /* length of "TKK='" */, tkkFunc.lastIndexOf('\''));
+    m_tkk = tkkFunc.substring(5 /* length of "tkk:'" */, tkkFunc.lastIndexOf('\''));
+
     return m_tkk;
   } while(line.length() > 0);
   client.stop();
