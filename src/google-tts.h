@@ -8,11 +8,12 @@
 
 #define HOST_GTRANS "translate.google.com"
 #define PATH_GTRANS "/translate_tts"
-#define FINGERPRINT_GTRANS "51:95:BF:29:CC:79:4B:FE:E2:0B:0F:EA:B5:95:1B:5A:0A:91:AB:39"
+#define FINGERPRINT_GTRANS "F8:1E:31:71:FA:08:5B:C0:4C:83:B6:64:4B:9F:22:9F:0C:BA:8E:57"
 
 typedef class GoogleTTS {
 
 private:
+  WiFiClientSecure* m_pClient = nullptr;
   unsigned long m_lastTimestamp = 0;
   String m_tkk;
 
@@ -23,6 +24,7 @@ private:
   long long int  XL (long long int a, char* b);
   
 public:
+  void setWiFiClientSecure(WiFiClientSecure* pClient);
   String getSpeechUrl(String text, String lang);
   String getSpeechUrl(String text) {
     return getSpeechUrl(text, "en");

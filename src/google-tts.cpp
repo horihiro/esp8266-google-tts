@@ -93,34 +93,50 @@ String GoogleTTS::createToken(const char* text, const char* key) {
   return String(lltoa(a, 10)) + '.' + lltoa(a ^ b, 10);
 }
 
+void GoogleTTS::setWiFiClientSecure(WiFiClientSecure* pClient) {
+  m_pClient = pClient;
+}
+
 String GoogleTTS::getTKK() {
   unsigned long current = millis();
-
-  WiFiClientSecure client;
-  if (!client.connect(HOST_GTRANS, 443)) {
+  bool bClientCreated = false;
+  // WiFiClientSecure client;
+  if (m_pClient == nullptr) {
+    m_pClient = new WiFiClientSecure();
+    bClientCreated = true;
+  }
+  if (!m_pClient->connect(HOST_GTRANS, 443)) {
     Serial.println("connection failed");
+    if (bClientCreated == true) {
+      delete m_pClient;
+      m_pClient = nullptr;
+    }
     return "_ERROR";
   }
 
-  client.print(
+  m_pClient->print(
     String("GET / HTTP/1.0\r\n") +
     "Host: " + HOST_GTRANS + "\r\n" +
     "User-Agent: " + LIB_NAME + "/" + LIB_VERSION + "\r\n" +
     "Accept-Encoding: identity\r\n" +
     "Accept: text/html\r\n\r\n");
   int timeout = millis() + 5000;
-  client.flush();
+  m_pClient->flush();
 
-  while (client.available() == 0) {
+  while (m_pClient->available() == 0) {
     if (timeout < millis()) {
-      client.stop();
+      m_pClient->stop();
+      if (bClientCreated == true) {
+        delete m_pClient;
+        m_pClient = nullptr;
+      }
       return "_TIMEOUT";
     }
   }
   String line = "";
   boolean isHeader = true;
   do {
-    line = client.readStringUntil('\r');
+    line = m_pClient->readStringUntil('\r');
      line.trim();
     if (line.length() == 0) {
       isHeader = false;
@@ -131,25 +147,33 @@ String GoogleTTS::getTKK() {
     char ch;
     do {
       tkkFunc = "";
-      client.readBytes(&ch, 1);
+      m_pClient->readBytes(&ch, 1);
       if (ch != 't') continue;
       tkkFunc += String(ch);
-      client.readBytes(&ch, 1);
+      m_pClient->readBytes(&ch, 1);
       if (ch != 'k') continue;
       tkkFunc += String(ch);
-      client.readBytes(&ch, 1);
+      m_pClient->readBytes(&ch, 1);
       if (ch != 'k') continue;
       tkkFunc += String(ch);
     } while(tkkFunc.length() < 3);
 
-    tkkFunc +=  client.readStringUntil(','); // "tkk:'xxxxxxxxx.yyyyyyyyy'"
+    tkkFunc +=  m_pClient->readStringUntil(','); // "tkk:'xxxxxxxxx.yyyyyyyyy'"
 
-    client.stop();
+    m_pClient->stop();
     m_tkk = tkkFunc.substring(5 /* length of "tkk:'" */, tkkFunc.lastIndexOf('\''));
 
+    if (bClientCreated == true) {
+      delete m_pClient;
+      m_pClient = nullptr;
+    }
     return m_tkk;
   } while(line.length() > 0);
-  client.stop();
+  m_pClient->stop();
+  if (bClientCreated == true) {
+    delete m_pClient;
+    m_pClient = nullptr;
+  }
   return "_ERROR";
 }
 
