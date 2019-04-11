@@ -2,6 +2,9 @@
 #define GoogleTTS_h
 
 #include <WiFiClientSecure.h>
+#ifdef ARDUINO_ARCH_ESP8266
+#include "esp8266sdk_version.h"
+#endif
 
 #define LIB_NAME "GoogleTTS for ESP8266"
 #define LIB_VERSION "1.0.7"

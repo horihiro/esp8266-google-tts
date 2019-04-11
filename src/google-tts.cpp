@@ -103,6 +103,9 @@ String GoogleTTS::getTKK() {
   // WiFiClientSecure client;
   if (m_pClient == nullptr) {
     m_pClient = new WiFiClientSecure();
+#if defined(ARDUINO_ARCH_ESP8266) && !defined(ARDUINO_ESP8266_RELEASE_BEFORE_THAN_2_5_0)
+    m_pClient->setFingerprint(FINGERPRINT_GTRANS);
+#endif
     bClientCreated = true;
   }
   if (!m_pClient->connect(HOST_GTRANS, 443)) {
