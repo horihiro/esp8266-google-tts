@@ -144,6 +144,17 @@ String GoogleTTS::getTKK() {
     if (line.length() == 0) {
       isHeader = false;
     }
+    if (line == "Server: ESF") {
+      // If `ESF` responses, there is no `TKK`.
+      // Call GoogleTTS::getTKK recursively.
+      m_pClient->stop();
+      if (bClientCreated == true) {
+        delete m_pClient;
+        m_pClient = nullptr;
+      }
+      delay(1);
+      return this->getTKK();
+    }
     if (isHeader) continue;
 
     String tkkFunc = "";
