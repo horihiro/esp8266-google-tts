@@ -114,10 +114,11 @@ void GoogleTTS::setWiFiClientSecure(WiFiClientSecure *pClient)
   m_pClient = pClient;
 }
 
-String GoogleTTS::getTKK()
+String GoogleTTS::getTKK(int maxRetry, int currentRetry)
 {
   unsigned long current = millis();
   bool bClientCreated = false;
+  char buf[100];
   // WiFiClientSecure client;
   if (m_pClient == nullptr)
   {
@@ -129,13 +130,14 @@ String GoogleTTS::getTKK()
   }
   if (!m_pClient->connect(HOST_GTRANS, 443))
   {
-    Serial.println("connection failed");
     if (bClientCreated == true)
     {
       delete m_pClient;
       m_pClient = nullptr;
     }
-    return "_ERROR";
+    sprintf(buf, "Failed to connect to Google Translate. trying again...  (current: %d, maxRetry: %d)", currentRetry, maxRetry);
+    Serial.println(buf);
+    return (maxRetry >= 0 && maxRetry <= currentRetry) ? "_ERROR_EXCEED_MAX_RETRY_COUNT" : this->getTKK(maxRetry, currentRetry + 1);
   }
 
   m_pClient->print(
@@ -157,7 +159,9 @@ String GoogleTTS::getTKK()
         delete m_pClient;
         m_pClient = nullptr;
       }
-      return "_TIMEOUT";
+      sprintf(buf, "Timeout. trying again...  (current: %d, maxRetry: %d)", currentRetry, maxRetry);
+      Serial.println(buf);
+      return (maxRetry >= 0 && maxRetry <= currentRetry) ? "_EXCEED_MAX_RETRY_COUNT" : this->getTKK(maxRetry, currentRetry + 1);
     }
   }
   String line = "";
@@ -181,7 +185,9 @@ String GoogleTTS::getTKK()
         m_pClient = nullptr;
       }
       delay(1);
-      return this->getTKK();
+      sprintf(buf, "Failed to get TKK. trying again...  (current: %d, maxRetry: %d)", currentRetry, maxRetry);
+      Serial.println(buf);
+      return (maxRetry >= 0 && maxRetry <= currentRetry) ? "_EXCEED_MAX_RETRY_COUNT" : this->getTKK(maxRetry, currentRetry + 1);
     }
     if (isHeader)
       continue;
@@ -223,12 +229,14 @@ String GoogleTTS::getTKK()
     delete m_pClient;
     m_pClient = nullptr;
   }
-  return "_ERROR";
+  sprintf(buf, "Failed to get TKK. trying again...  (current: %d, maxRetry: %d)", currentRetry, maxRetry);
+  Serial.println(buf);
+  return (maxRetry >= 0 && maxRetry <= currentRetry) ? "_ERROR_EXCEED_MAX_RETRY_COUNT" : this->getTKK(maxRetry, currentRetry + 1);
 }
 
-String GoogleTTS::getSpeechUrl(String text, String lang)
+String GoogleTTS::getSpeechUrl(String text, String lang, int maxRetry)
 {
-  String tkk = this->getTKK();
+  String tkk = this->getTKK(maxRetry, 0);
   if (tkk.indexOf("_") == 0)
   {
     return tkk;
