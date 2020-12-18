@@ -1,6 +1,6 @@
 {
   "name": "esp8266-google-tts",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "keywords": "esp8266, TTS, Google, TextToSpeech, Text2Speech",
   "description": "generate the link to speech mp3 on esp8266. This library depends on Google Translate Service.",
   "repository":
