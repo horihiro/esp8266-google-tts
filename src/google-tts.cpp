@@ -236,21 +236,21 @@ String GoogleTTS::getTKK(int maxRetry, int currentRetry)
 
 String GoogleTTS::getSpeechUrl(String text, String lang, int maxRetry)
 {
-  String tkk = this->getTKK(maxRetry, 0);
-  if (tkk.indexOf("_") == 0)
-  {
-    return tkk;
-  }
-  String token = this->createToken(text.c_str(), tkk.c_str());
-  int i, j;
-  const char *t = text.c_str();
-  for (i = 0, j = 0; i < strlen(t); i++)
-  {
-    if (t[i] < 0x80 || t[i] > 0xbf)
-    {
-      j++;
-    }
-  }
+  // String tkk = this->getTKK(maxRetry, 0);
+  // if (tkk.indexOf("_") == 0)
+  // {
+  //   return tkk;
+  // }
+  // String token = this->createToken(text.c_str(), tkk.c_str());
+  // int i, j;
+  // const char *t = text.c_str();
+  // for (i = 0, j = 0; i < strlen(t); i++)
+  // {
+  //   if (t[i] < 0x80 || t[i] > 0xbf)
+  //   {
+  //     j++;
+  //   }
+  // }
 
-  return String("https://") + HOST_GTRANS + PATH_GTRANS + "?ie=UTF-8&q=" + this->urlencode(text) + "&tl=" + lang + "&textlen=" + String(j) + "&tk=" + token + "&total=1&idx=0&client=t&prev=input&ttsspeed=1";
+  return String("https://") + HOST_GTRANS + PATH_GTRANS + "?ie=UTF-8&q=" + this->urlencode(text) + "&tl=" + lang + "&client=tw-ob&ttsspeed=1";
 }
