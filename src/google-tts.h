@@ -17,26 +17,13 @@ typedef class GoogleTTS
 {
 
 private:
-  WiFiClientSecure *m_pClient = nullptr;
-  unsigned long m_lastTimestamp = 0;
-  String m_tkk;
-
-  String getTKK(int maxRetry, int currentRetry);
-  String createToken(const char *text, const char *key);
   String urlencode(String str);
-  char *lltoa(long long val, int base);
-  long long int XL(long long int a, char *b);
 
 public:
-  void setWiFiClientSecure(WiFiClientSecure *pClient);
-  String getSpeechUrl(String text, String lang, int maxRetryCount);
-  String getSpeechUrl(String text, String lang)
-  {
-    return getSpeechUrl(text, lang, 10);
-  };
+  String getSpeechUrl(String text, String lang);
   String getSpeechUrl(String text)
   {
-    return getSpeechUrl(text, "en", 10);
+    return getSpeechUrl(text, "en");
   }
 } TTS;
 
