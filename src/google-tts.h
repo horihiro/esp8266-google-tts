@@ -7,7 +7,7 @@
 #endif
 
 #define LIB_NAME "GoogleTTS for ESP8266"
-#define LIB_VERSION "1.0.10"
+#define LIB_VERSION "1.1.0"
 
 #define HOST_GTRANS "translate.google.com"
 #define PATH_GTRANS "/translate_tts"
