@@ -20,6 +20,10 @@ private:
   String urlencode(String str);
 
 public:
+  void setWiFiClientSecure(WiFiClientSecure *pClient)
+  {
+    // this method does nothing, only for keeping compatibility
+  }
   String getSpeechUrl(String text, String lang);
   String getSpeechUrl(String text)
   {
