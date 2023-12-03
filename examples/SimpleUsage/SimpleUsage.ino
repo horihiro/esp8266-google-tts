@@ -1,8 +1,8 @@
 #include <google-tts.h>
 #include <ESP8266WiFi.h>
 
-const char* ssid     = "<REPLASE_YOUR_WIFI_SSID>";
-const char* password = "<REPLASE_YOUR_WIFI_PASSWORD>";
+const char* ssid     = "<REPLACE_YOUR_WIFI_SSID>";
+const char* password = "<REPLACE_YOUR_WIFI_PASSWORD>";
 
 String getMacAddress() {
   byte mac[6];
