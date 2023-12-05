@@ -17,14 +17,15 @@ This library can be installed from the Library Manager on Arduino IDE
 #include <google-tts.h>
 #include <ESP8266WiFi.h>
 
-const char* ssid     = "<REPLASE_YOUR_WIFI_SSID>";
-const char* password = "<REPLASE_YOUR_WIFI_PASSWORD>";
+const char* ssid     = "<REPLACE_YOUR_WIFI_SSID>";
+const char* password = "<REPLACE_YOUR_WIFI_PASSWORD>";
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   Serial.println("");
-  WiFi.mode(WIFI_STA);  WiFi.begin(ssid, password);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(250);
